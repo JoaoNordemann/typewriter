@@ -68,3 +68,15 @@ Esses links abrem a nota no Obsidian. Eles não importam nem ativam um plano no 
 - Cofres e abertura de pastas: https://help.obsidian.md/Files+and+folders/Manage+vaults
 - Plugin nativo Modelos: https://help.obsidian.md/Plugins/Templates
 - Links e protocolo URI: https://help.obsidian.md/Extending+Obsidian/Obsidian+URI
+
+## Relacionar tempos, planos e dias
+
+Os cronômetros geram um Markdown por plano na subpasta `tempos` dos registros. Se a pasta de registros estiver no seu cofre, os relatórios também aparecerão nele.
+
+Abra o relatório `tempos/meu-plano.md.tempos.md` para consultar o resumo por tarefa e os intervalos com data, hora, segundos e deslocamento UTC. O link no início volta ao plano armazenado, e os links `[[AAAA-MM-DD]]` relacionam os intervalos às notas dos dias. Esses formatos de links são suportados pelo [Obsidian](https://help.obsidian.md/links).
+
+Os links de dia não criam notas automaticamente. Se suas notas diárias usam o nome `AAAA-MM-DD`, eles permitem navegar até elas; se você usa outro padrão de nomes, crie uma nota com esse nome ou faça a ligação manual para sua nota diária. Se houver arquivos com o mesmo nome em pastas diferentes, confira o destino escolhido pelo Obsidian.
+
+Você pode criar uma nota pessoal com `[[tempos/meu-plano.md.tempos|Tempo do meu plano]]`, ajustando o caminho a partir da raiz do cofre. Quando os registros estiverem numa subpasta `Typewriter`, por exemplo, use `[[Typewriter/tempos/meu-plano.md.tempos|Tempo do meu plano]]`.
+
+Não edite o relatório gerado enquanto usa o aplicativo: ele é reconstruído a partir do progresso salvo. Mantenha comentários e interpretações em outra nota, ligada ao relatório. Ao mover registros para outro lugar, copie também os sidecars e a pasta `tempos`. Os sidecars contêm o caminho absoluto do plano; se esse caminho mudar, preserve os relatórios e o backup original, pois o progresso poderá ser reconstruído do Markdown sem recuperar os tempos do JSON antigo.

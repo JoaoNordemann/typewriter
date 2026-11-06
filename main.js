@@ -1,4 +1,11 @@
-const { app, BrowserWindow, ipcMain, screen, dialog } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  screen,
+  dialog,
+  powerMonitor,
+} = require("electron");
 const path = require("node:path");
 const fs = require("node:fs/promises");
 const { Records, atomic } = require("./records");
@@ -181,6 +188,49 @@ app.whenReady().then(async () => {
     return plan;
   });
   handle("toggle", (i) => records.toggle(i));
+  handle("timer", (action, index) => {
+    if (!["start", "pause", "snapshot"].includes(action))
+      throw Error("Ação de cronômetro inválida");
+    return records.timer(action, index);
+  });
+  function backgroundTimer(action, reason) {
+    const next = queue.then(async () => {
+      if (!records.active?.time.state.running) return;
+      const plan = await records.timer(action, null, reason);
+      if (!win.isDestroyed()) win.webContents.send("timer-state", { plan });
+    });
+    queue = next.catch((error) => {
+      if (!win.isDestroyed())
+        win.webContents.send("timer-state", {
+          plan: records.view(),
+          error: error.message,
+        });
+    });
+    return next;
+  }
+  const timerHeartbeat = setInterval(() => {
+    backgroundTimer("checkpoint").catch(() => {});
+  }, 10000);
+  const onSuspend = () => {
+    backgroundTimer("pause", "computador suspenso").catch(() => {});
+  };
+  powerMonitor.on("suspend", onSuspend);
+  let closing = false;
+  win.on("close", (event) => {
+    if (closing || !records.active?.time.state.running) return;
+    event.preventDefault();
+    closing = true;
+    backgroundTimer("pause", "aplicativo fechado")
+      .then(() => win.close())
+      .catch((error) => {
+        closing = false;
+        dialog.showErrorBox("Não foi possível salvar o tempo", error.message);
+      });
+  });
+  win.on("closed", () => {
+    clearInterval(timerHeartbeat);
+    powerMonitor.removeListener("suspend", onSuspend);
+  });
   handle("mode", (list) => resizeWindow(list === true));
   handle("mute", async (muted) => {
     config.muted = !!muted;

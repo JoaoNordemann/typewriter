@@ -7,3 +7,6 @@ test/.scale-runtime/
 test/*.png
 test/.regions-*/
 test/.open-*/
+test/.timing-*/
+test/.timer-ui-*/
+test/exemplo-tempos.md

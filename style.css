@@ -488,3 +488,33 @@ textarea:focus {
   outline: 1px solid var(--red);
   outline-offset: 0;
 }
+.timer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1px 0 7px 20px;
+  gap: 5px;
+  font-size: 5px;
+  line-height: 1.8;
+  color: #888;
+  -webkit-app-region: no-drag;
+}
+.timer-toggle {
+  border: 1px solid var(--ink);
+  padding: 4px 5px;
+  color: var(--ink);
+  background: var(--cream);
+  font-size: 5px;
+  line-height: 1.4;
+}
+.timer-toggle:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.timer-bar.running {
+  color: var(--red);
+}
+.timer-bar.running .timer-toggle {
+  color: var(--cream);
+  background: var(--red);
+}

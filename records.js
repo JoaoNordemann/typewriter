@@ -1,5 +1,6 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const { TimeLog } = require("./time-log");
 const taskRE = /^(\s*- \[)([ xX])(\]\s*)(.*)$/;
 const stampRE = /\s*\(done \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\s*$/;
 function parse(markdown) {
@@ -75,6 +76,7 @@ class Records {
       throw Error("O plano aponta para fora da pasta de registros");
     const markdown = await fs.readFile(file, "utf8");
     const plan = parse(markdown);
+    let timing = null;
     try {
       const s = JSON.parse(await fs.readFile(this.side(file), "utf8"));
       if (
@@ -89,19 +91,25 @@ class Records {
               (typeof t.at === "string" && !isNaN(Date.parse(t.at)))),
         )
       ) {
+        timing = s.timing;
         plan.tasks.forEach((t, i) =>
           Object.assign(t, { done: s.tasks[i].done, at: s.tasks[i].at }),
         );
       }
     } catch {}
-    this.active = { ...plan, path: file, markdown };
+    this.active = {
+      ...plan,
+      path: file,
+      markdown,
+      time: new TimeLog(this.directory, file, plan.title, plan.tasks, timing),
+    };
     await this.persist();
     return this.view();
   }
   view() {
     if (!this.active) return null;
-    const { markdown, ...v } = this.active;
-    return v;
+    const { markdown, time, ...v } = this.active;
+    return { ...v, timing: time.view() };
   }
   async import(markdown, name) {
     parse(markdown);
@@ -139,20 +147,64 @@ class Records {
     }
     return this.open(file);
   }
-  async persist() {
+  async persistTime() {
     const a = this.active;
     if (!a) return;
+    if (a.time.state.running || a.time.state.sessions.length)
+      await a.time.reportFile();
     await atomic(
       this.side(a.path),
       JSON.stringify(
         {
           planPath: a.path,
           tasks: a.tasks.map((t, index) => ({ index, done: t.done, at: t.at })),
+          timing: a.time.state,
         },
         null,
         2,
       ),
     );
+    await a.time.writeReport();
+  }
+  async timer(action, index, reason = "pausa manual") {
+    if (!this.active) {
+      if (
+        action === "snapshot" ||
+        action === "pause" ||
+        action === "checkpoint"
+      )
+        return null;
+      throw Error("Abra um plano antes de iniciar o cronômetro");
+    }
+    if (action === "snapshot") return this.view();
+    const time = this.active.time,
+      previous = structuredClone(time.state);
+    if (action === "start") time.start(index);
+    else if (action === "pause") time.stop(reason);
+    else if (action === "checkpoint") {
+      if (!time.state.running) return this.view();
+      time.checkpoint();
+    } else throw Error("Ação de cronômetro inválida");
+    try {
+      await this.persistTime();
+    } catch (e) {
+      // If the authoritative sidecar was saved, keep that state for a later report retry.
+      try {
+        const saved = JSON.parse(
+          await fs.readFile(this.side(this.active.path), "utf8"),
+        );
+        time.state = saved.timing || previous;
+      } catch {
+        time.state = previous;
+      }
+      throw e;
+    }
+    return this.view();
+  }
+  async persist() {
+    const a = this.active;
+    if (!a) return;
+    await this.persistTime();
     a.markdown = updateMarkdown(a.markdown, a.tasks);
     await atomic(a.path, a.markdown);
   }
@@ -160,6 +212,8 @@ class Records {
     if (!this.active || !Number.isInteger(index) || !this.active.tasks[index])
       throw Error("Tarefa inválida");
     const t = this.active.tasks[index];
+    if (!t.done && this.active.time.state.running?.index === index)
+      await this.timer("pause", null, "tarefa concluída");
     t.done = !t.done;
     t.at = t.done ? new Date().toISOString() : null;
     await this.persist();
@@ -169,6 +223,14 @@ class Records {
     const a = this.active;
     if (!a) return;
     if (!this.safe(a.path)) throw Error("Caminho de registros não permitido");
+    if (!["discard", "log", "complete"].includes(action))
+      throw Error("Ação inválida");
+    if (a.time.state.running)
+      await this.timer(
+        "pause",
+        null,
+        action === "complete" ? "plano concluído" : "plano interrompido",
+      );
     if (action === "discard") {
       await fs.unlink(a.path).catch((e) => {
         if (e.code !== "ENOENT") throw e;

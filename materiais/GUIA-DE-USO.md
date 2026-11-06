@@ -70,3 +70,31 @@ Para mudar a pasta de registros:
 ## Usar com o Obsidian
 
 Leia `OBSIDIAN.md` neste pacote. O template básico funciona em qualquer editor; o template específico do Obsidian usa variáveis do plugin nativo Modelos.
+
+## Cronômetro por tarefa
+
+Cada tarefa mostra seu tempo acumulado no formato `HH:MM:SS` e um botão:
+
+- **▶ iniciar:** inicia ou continua a contagem daquela tarefa.
+- **Ⅱ pausar:** encerra o intervalo atual e preserva o tempo já medido.
+
+As pausas não são somadas. Só uma tarefa pode estar em contagem por vez; iniciar outra encerra o intervalo anterior como “troca de tarefa”. Na lista completa, cada tarefa tem seus próprios controles e total. Para medir novamente uma tarefa concluída, desmarque-a primeiro; o tempo anterior é preservado.
+
+Marcar a tarefa como concluída, interromper o plano, fechar o aplicativo ou suspender o computador pausa a contagem. Ao reabrir, o cronômetro fica pausado até você iniciar novamente. Cancelar o diálogo de interrupção mantém a contagem como estava.
+
+O aplicativo salva um ponto de recuperação a cada 10 segundos. Em uma queda inesperada ou encerramento forçado, o intervalo aberto termina no último ponto salvo e recebe a indicação “sessão recuperada após interrupção”. Assim, o tempo com o aplicativo fechado não é somado; até os últimos 10 segundos não salvos podem ser perdidos. Use a pausa ou feche normalmente para registrar o encerramento exato.
+
+### Relatório de tempos
+
+Após o primeiro início, é criado um relatório por plano dentro de `C:\Typewriter\tempos` (ou na subpasta `tempos` do diretório configurado). Exemplo: `meu-plano.md.tempos.md`.
+
+O relatório contém:
+
+- Link para o plano armazenado.
+- Resumo por tarefa, com seção e total acumulado.
+- Cada intervalo: tarefa, dia, data e hora inicial/final com segundos e deslocamento UTC, duração e motivo do encerramento.
+- Links para os dias no formato `[[AAAA-MM-DD]]`, úteis no Obsidian.
+
+Enquanto o cronômetro roda, o intervalo aparece como “em andamento”. O resumo do relatório soma os intervalos encerrados; a tela do aplicativo mostra também a contagem ao vivo. O Markdown é atualizado ao iniciar, pausar e nos pontos de recuperação. Os dados usados para reconstruí-lo ficam no arquivo de progresso do plano.
+
+O relatório é gerado automaticamente: mantenha suas próprias anotações em outra nota. Faça backup de toda a pasta de registros, incluindo os sidecars e a subpasta `tempos`. Se você descartar um plano, seu relatório de tempos é preservado como histórico; o link para o plano excluído poderá ficar sem destino.

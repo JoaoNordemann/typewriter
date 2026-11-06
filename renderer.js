@@ -102,8 +102,95 @@ function taskRow(task, index) {
   text.textContent = task.text;
   row.append(box, text);
   row.onclick = () => toggle(index, row);
-  return row;
+  const entry = document.createElement("div");
+  entry.className = "task-entry";
+  const bar = document.createElement("div");
+  bar.className = "timer-bar";
+  bar.dataset.timerIndex = index;
+  const elapsed = document.createElement("span");
+  elapsed.className = "timer-elapsed";
+  elapsed.setAttribute("aria-label", "Tempo acumulado nesta tarefa");
+  const button = document.createElement("button");
+  button.className = "timer-toggle";
+  button.type = "button";
+  button.onclick = () => controlTimer(index);
+  bar.append(elapsed, button);
+  entry.append(row, bar);
+  updateTimerBar(bar, index);
+  return entry;
 }
+function elapsedLabel(ms) {
+  const seconds = Math.floor(Math.max(0, ms) / 1000),
+    pad = (n) => String(n).padStart(2, "0");
+  return (
+    pad(Math.floor(seconds / 3600)) +
+    ":" +
+    pad(Math.floor(seconds / 60) % 60) +
+    ":" +
+    pad(seconds % 60)
+  );
+}
+function updateTimerBar(bar, index) {
+  const timing = plan?.timing,
+    running = timing?.running;
+  const active = running?.index === index;
+  const elapsed =
+    (timing?.totals[index] || 0) +
+    (active ? Math.max(0, Date.now() - Date.parse(running.startedAt)) : 0);
+  const label = elapsedLabel(elapsed),
+    output = bar.querySelector(".timer-elapsed");
+  if (output.textContent !== label) output.textContent = label;
+  const button = bar.querySelector("button");
+  button.textContent = active ? "Ⅱ pausar" : "▶ iniciar";
+  button.title = active
+    ? "Pausar o cronômetro desta tarefa"
+    : "Iniciar ou continuar o cronômetro desta tarefa";
+  button.setAttribute(
+    "aria-label",
+    (active ? "Pausar" : "Iniciar") + " cronômetro da tarefa " + (index + 1),
+  );
+  button.disabled = !!plan.tasks[index].done;
+  bar.classList.toggle("running", active);
+}
+setInterval(() => {
+  if (plan)
+    document
+      .querySelectorAll("[data-timer-index]")
+      .forEach((bar) => updateTimerBar(bar, Number(bar.dataset.timerIndex)));
+}, 250);
+async function controlTimer(index) {
+  if (busy || !$("#overlay").hidden) return;
+  busy = true;
+  const scroll = $("#paper").scrollTop;
+  try {
+    plan = await api.timer(
+      plan.timing?.running?.index === index ? "pause" : "start",
+      index,
+    );
+    render();
+    $("#paper").scrollTop = scroll;
+    document
+      .querySelector(`[data-timer-index="${index}"] button`)
+      ?.focus({ preventScroll: true });
+    $("#error").textContent = "";
+  } catch (e) {
+    try {
+      plan = await api.timer("snapshot");
+      render();
+    } catch {}
+    error(e);
+  } finally {
+    busy = false;
+  }
+}
+api.onTimerState((state) => {
+  if (!plan || state.plan?.path !== plan.path) return;
+  plan.timing = state.plan.timing;
+  document
+    .querySelectorAll("[data-timer-index]")
+    .forEach((bar) => updateTimerBar(bar, Number(bar.dataset.timerIndex)));
+  if (state.error) error(Error(state.error));
+});
 function render(focusIndex) {
   $("#progress").textContent = plan
     ? `${plan.tasks.filter((t) => t.done).length}/${plan.tasks.length} concluídas`
