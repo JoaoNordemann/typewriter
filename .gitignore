@@ -1,0 +1,7 @@
+node_modules/
+*.log
+test/.runtime/
+dist/
+test/.portable-runtime/
+test/.scale-runtime/
+test/*.png

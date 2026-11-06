@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; media-src 'self'"
+    />
+    <title>Typewriter</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <div id="paper-track">
+        <article id="paper" aria-label="Plano">
+          <div id="paper-content"></div>
+        </article>
+      </div>
+      <div id="machine">
+        <div class="top">
+          <div class="roller"></div>
+          <div class="slot"></div>
+        </div>
+        <div class="body">
+          <nav aria-label="Controles do Typewriter">
+            <button id="add" title="Colar um plano (Ctrl+V / ⌘V)">+</button
+            ><span id="progress">0/0 concluídas</span
+            ><span class="ornament">+</span
+            ><button id="mode" title="Mostrar lista completa">≡</button
+            ><button id="sound" title="Silenciar som">♪</button>
+          </nav>
+          <div id="idle">
+            <p>digite seu plano...<span class="cursor">|</span></p>
+            <small>arraste um arquivo .md ou cole (Ctrl+V / ⌘V)</small>
+          </div>
+          <div id="keyboard" aria-hidden="true"></div>
+          <div class="spacebar"></div>
+        </div>
+      </div>
+      <p id="error" role="alert"></p>
+      <div id="confetti" aria-hidden="true"></div>
+    </main>
+    <div id="overlay" hidden>
+      <section
+        class="dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialog-title"
+      >
+        <h1 id="dialog-title"></h1>
+        <p id="dialog-text"></p>
+        <textarea
+          id="note"
+          placeholder="o que você aprendeu? o que foi difícil?"
+        ></textarea>
+        <div id="actions"></div>
+      </section>
+    </div>
+    <script src="renderer.js"></script>
+  </body>
+</html>

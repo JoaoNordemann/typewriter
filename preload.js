@@ -1,0 +1,11 @@
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
+contextBridge.exposeInMainWorld("typewriter", {
+  initial: () => ipcRenderer.invoke("initial"),
+  importText: (text) => ipcRenderer.invoke("import", { text }),
+  importFile: (file) =>
+    ipcRenderer.invoke("import", { path: webUtils.getPathForFile(file) }),
+  toggle: (index) => ipcRenderer.invoke("toggle", index),
+  mode: (list) => ipcRenderer.invoke("mode", list),
+  mute: (muted) => ipcRenderer.invoke("mute", muted),
+  finish: (action, note) => ipcRenderer.invoke("finish", action, note),
+});

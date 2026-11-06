@@ -1,0 +1,489 @@
+@font-face {
+  font-family: Pixel;
+  src: url("./node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+:root {
+  --red: #c1443c;
+  --cream: #f5ede0;
+  --ink: #222;
+  --border: #111;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  width: 420px;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  color: var(--ink);
+  font-family: Pixel, "Press Start 2P", monospace;
+  font-synthesis: none;
+}
+button,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  -webkit-app-region: no-drag;
+}
+button:focus-visible,
+.task:focus-visible {
+  outline: 2px dotted var(--red);
+  outline-offset: 3px;
+}
+button:disabled {
+  cursor: wait;
+}
+#app {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: column;
+  padding-bottom: 38px;
+  -webkit-app-region: drag;
+  position: relative;
+}
+#paper-track {
+  width: 300px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  margin-bottom: -3px;
+  z-index: 1;
+}
+#paper {
+  width: 300px;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-bottom: 0;
+  padding: 14px 16px 10px;
+  min-height: 112px;
+  max-height: min(320px, calc(100vh - 310px));
+  overflow: hidden;
+  transform: translateY(101%);
+  visibility: hidden;
+  -webkit-app-region: no-drag;
+}
+#paper.visible {
+  visibility: visible;
+  transform: translateY(0);
+}
+#paper.list {
+  max-height: min(520px, calc(100vh - 310px));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--red) var(--cream);
+}
+#paper::-webkit-scrollbar {
+  width: 4px;
+}
+#paper::-webkit-scrollbar-thumb {
+  background: var(--red);
+}
+#paper::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+#paper.printing {
+  animation: print 800ms steps(1, end);
+}
+@keyframes print {
+  0% {
+    transform: translateY(100%);
+  }
+  25% {
+    transform: translateY(60%);
+  }
+  50% {
+    transform: translateY(20%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+#paper.retract {
+  transition: transform 0.4s steps(5, end);
+  transform: translateY(101%);
+}
+.title {
+  font-size: 7px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin: 0 0 12px;
+  line-height: 1.8;
+}
+.divider {
+  border-top: 2px dotted var(--red);
+  margin-bottom: 12px;
+}
+.section {
+  position: relative;
+  font-size: 5px;
+  line-height: 1.8;
+  text-transform: uppercase;
+  color: var(--red);
+  border-top: 1px dotted var(--red);
+  padding-top: 8px;
+  margin: 9px 0 5px;
+  min-height: 18px;
+  padding-right: 43px;
+}
+.stamp {
+  position: absolute;
+  right: 0;
+  top: 5px;
+  border: 1px solid var(--red);
+  padding: 3px;
+  transform: rotate(-10deg);
+  font-size: 5px;
+}
+.task {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  width: 100%;
+  font-size: 6px;
+  line-height: 1.6;
+  text-align: left;
+  -webkit-app-region: no-drag;
+}
+.box {
+  display: block;
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--ink);
+  background: var(--cream);
+}
+.box svg {
+  width: 8px;
+  height: 8px;
+  display: block;
+  visibility: hidden;
+}
+.done .box {
+  background: var(--red);
+}
+.done svg {
+  visibility: visible;
+}
+.task-text {
+  position: relative;
+  padding-top: 1px;
+  overflow-wrap: anywhere;
+}
+.done .task-text {
+  color: #888;
+  text-decoration: line-through;
+  text-decoration-color: var(--ink);
+  text-decoration-thickness: 1px;
+}
+.checking svg path {
+  stroke-dasharray: 15;
+  stroke-dashoffset: 15;
+  animation: check 0.25s steps(4, end) forwards;
+}
+.checking .task-text:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--ink);
+  animation: strike 0.3s steps(6, end);
+  width: 100%;
+}
+@keyframes check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes strike {
+  from {
+    width: 0;
+  }
+}
+.leaving {
+  animation: leave 0.2s steps(4, end) forwards;
+}
+@keyframes leave {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+.arriving {
+  animation: arrive 0.3s steps(5, end);
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+.reveal {
+  animation: reveal 0.1s steps(1, end) both;
+}
+@keyframes reveal {
+  from {
+    visibility: hidden;
+  }
+  to {
+    visibility: visible;
+  }
+}
+.all-done {
+  text-align: center;
+  color: var(--red);
+  font-size: 12px;
+  line-height: 2;
+  padding: 15px 0;
+}
+#machine {
+  width: 360px;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.top {
+  width: 360px;
+  background: var(--ink);
+  border: 3px solid var(--border);
+  padding: 7px 17px 0;
+}
+.roller {
+  width: 320px;
+  height: 16px;
+  border: 2px solid var(--border);
+  background: #444;
+  margin: 0 auto;
+}
+.slot {
+  width: 280px;
+  height: 6px;
+  background: #000;
+  margin: 4px auto 0;
+}
+.body {
+  width: 360px;
+  border: 3px solid var(--border);
+  border-top: 0;
+  background: var(--red);
+  padding: 9px 14px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cream);
+  border: 2px solid var(--border);
+  font-size: 6px;
+  height: 28px;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+}
+nav button {
+  min-width: 24px;
+  min-height: 22px;
+  font-size: 12px;
+}
+#progress {
+  font-size: 6px;
+}
+.ornament {
+  font-size: 10px;
+}
+#idle {
+  text-align: center;
+  color: var(--cream);
+  padding: 5px 0 8px;
+}
+#idle p {
+  font-size: 8px;
+  margin: 4px 0 12px;
+}
+#idle small {
+  font-size: 5px;
+  line-height: 1.8;
+  display: block;
+}
+.cursor {
+  animation: blink 0.8s steps(1, end) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.key-row {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--cream);
+  font-size: 5px;
+}
+.spacebar {
+  width: 110px;
+  height: 21px;
+  border: 2px solid var(--border);
+  background: var(--cream);
+  margin: 0 auto;
+}
+.drag-over #machine {
+  outline: 3px dashed var(--cream);
+  outline-offset: 6px;
+}
+#error {
+  position: absolute;
+  bottom: 10px;
+  color: var(--red);
+  font-size: 6px;
+  max-width: 360px;
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+  -webkit-app-region: no-drag;
+}
+.shake #machine {
+  animation: shake 0.35s steps(1, end);
+}
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-app-region: no-drag;
+}
+#overlay[hidden] {
+  display: none;
+}
+.dialog {
+  width: 320px;
+  background: var(--cream);
+  border: 3px solid var(--border);
+  padding: 18px 14px;
+}
+.dialog h1 {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--red);
+  margin: 0 0 16px;
+}
+.dialog p {
+  font-size: 6px;
+  line-height: 1.8;
+  margin: 0 0 13px;
+}
+textarea {
+  width: 100%;
+  height: 72px;
+  resize: none;
+  border: 2px solid var(--border);
+  background: var(--cream);
+  padding: 7px;
+  font-size: 6px;
+  line-height: 1.8;
+  outline-color: var(--red);
+}
+#actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+#actions button {
+  background: var(--red);
+  color: var(--cream);
+  border: 2px solid var(--border);
+  font-size: 6px;
+  padding: 9px 7px;
+  line-height: 1.6;
+}
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9;
+}
+.confetti {
+  position: absolute;
+  top: -12px;
+  width: 6px;
+  height: 6px;
+  animation: fall 1.6s steps(18, end) forwards;
+}
+@keyframes fall {
+  to {
+    transform: translate(var(--drift), 950px) rotate(540deg);
+  }
+}
+.spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--red);
+  left: 12px;
+  top: 8px;
+  pointer-events: none;
+  animation: spark 0.5s steps(5, end) forwards;
+}
+@keyframes spark {
+  to {
+    transform: translate(var(--x), var(--y));
+    opacity: 0;
+  }
+}
+
+textarea,
+.dialog button,
+nav {
+  border-radius: 0;
+}
+textarea:focus {
+  outline: 1px solid var(--red);
+  outline-offset: 0;
+}
