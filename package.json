@@ -1,6 +1,6 @@
 {
   "name": "typewriter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Uma pequena máquina de escrever pixelada para planos em Markdown",
   "main": "main.js",
@@ -8,7 +8,7 @@
     "start": "electron .",
     "test": "node --test test/*.test.js",
     "test:electron": "node test/electron.cjs",
-    "build:win": "electron --version && electron-builder --win portable --x64",
+    "build:win": "powershell -NoProfile -File scripts/create-icon.ps1 && electron --version && electron-builder --win portable --x64",
     "package:win": "npm run build:win && powershell -NoProfile -File scripts/package.ps1",
     "test:portable": "node test/portable-smoke.cjs",
     "test:regions": "node test/input-regions.cjs",
@@ -40,7 +40,8 @@
       "index.html",
       "style.css",
       "package.json",
-      "time-log.js"
+      "time-log.js",
+      "build/icon.ico"
     ],
     "extraResources": [
       {
@@ -57,7 +58,8 @@
           ]
         }
       ],
-      "signAndEditExecutable": false
+      "signExecutable": false,
+      "icon": "build/icon.ico"
     },
     "portable": {
       "artifactName": "Typewriter-${version}-portatil.exe"

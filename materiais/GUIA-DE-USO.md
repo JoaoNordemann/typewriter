@@ -3,7 +3,7 @@
 ## Abrir o aplicativo
 
 1. Extraia todo o conteúdo do pacote ZIP para uma pasta de sua preferência.
-2. Abra `Typewriter-1.1.0-portatil.exe`. Não é necessário instalar Node.js ou Electron.
+2. Abra `Typewriter-1.2.0-portatil.exe`. Não é necessário instalar Node.js ou Electron.
 3. Arraste a carcaça vermelha ou o rolo para posicionar a janela. Ela permanece sobre as demais janelas.
 4. Para fechar, use Alt+F4 com a janela em foco.
 

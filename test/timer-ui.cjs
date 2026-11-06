@@ -17,7 +17,12 @@ const assert = require("node:assert/strict");
     const env = { ...process.env };
     delete env.ELECTRON_RUN_AS_NODE;
     app = await _electron.launch({
-      args: [".", `--user-data-dir=${config}`],
+      args: process.env.TYPEWRITER_EXECUTABLE
+        ? [`--user-data-dir=${config}`]
+        : [".", `--user-data-dir=${config}`],
+      ...(process.env.TYPEWRITER_EXECUTABLE
+        ? { executablePath: process.env.TYPEWRITER_EXECUTABLE }
+        : {}),
       env,
     });
     page = await app.firstWindow();

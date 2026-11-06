@@ -4,7 +4,7 @@ Uma pequena máquina de escrever pixelada para acompanhar planos em Markdown. In
 
 ## Executável Windows
 
-O pacote pronto fica em `dist/Typewriter-1.1.0-Windows.zip`. Extraia-o e execute `Typewriter-1.1.0-portatil.exe`. Não é necessário instalar Node.js ou Electron para usar o executável. O pacote inclui:
+O pacote pronto fica em `dist/Typewriter-1.2.0-Windows.zip`. Extraia-o e execute `Typewriter-1.2.0-portatil.exe`. Não é necessário instalar Node.js ou Electron para usar o executável. O pacote inclui:
 
 - `GUIA-DE-USO.md`: instruções de abertura, importação, progresso, conclusão, interrupção e backup.
 - `template-plano.md`: modelo editável de plano.
@@ -57,3 +57,5 @@ A área de interação acompanha apenas a máquina, o papel visível e as mensag
 Para selecionar um arquivo Markdown existente, use o primeiro + ou Ctrl+O (Command+O no macOS). O segundo + cola texto. Um plano selecionado diretamente na pasta de registros é retomado com seu sidecar, sem duplicação; arquivos externos são copiados. Execute npm run test:open-file para validar seleção, cancelamento e restauração.
 
 O cronômetro de cada tarefa permite iniciar/pausar e acumular intervalos, com apenas uma tarefa ativa por vez. Os relatórios Markdown em `tempos/` relacionam o plano e as datas no Obsidian. Dados de cronômetro são persistidos no sidecar; fechamentos normais, conclusão e suspensão pausam a contagem, e quedas inesperadas são recuperadas até o último checkpoint de 10 segundos. Execute `npm run test:timers` para validar os controles e a restauração no Electron.
+
+O ícone Windows usa imagem_2026-11-05_212845945.ico como original. O script scripts/create-icon.ps1 preserva a imagem de 32 pixels e gera uma versão de 256 pixels sem suavização em build/icon.ico. O ícone é aplicado ao executável portátil, à aplicação empacotada e à janela. Para verificar os recursos incorporados após compilar, execute node test/release-icon.cjs.

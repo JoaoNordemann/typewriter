@@ -14,7 +14,9 @@ const assert = require("node:assert/strict");
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   const child = spawn(
-    path.resolve("dist/Typewriter-1.1.0-portatil.exe"),
+    path.resolve(
+      `dist/Typewriter-${require("../package.json").version}-portatil.exe`,
+    ),
     [
       `--user-data-dir=${config}`,
       "--remote-debugging-address=127.0.0.1",

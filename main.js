@@ -68,6 +68,7 @@ app.whenReady().then(async () => {
     resizable: false,
     frame: false,
     transparent: true,
+    icon: path.join(__dirname, "build", "icon.ico"),
     alwaysOnTop: true,
     backgroundColor: "#00000000",
     webPreferences: {
