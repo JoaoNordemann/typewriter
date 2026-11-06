@@ -53,3 +53,5 @@ Para verificar uma compilação, defina `TYPEWRITER_EXECUTABLE` com o caminho ab
 A validação de desktop foi feita no Windows. O comportamento nativo do macOS e a saída audível precisam ser conferidos em um desktop macOS.
 
 A área de interação acompanha apenas a máquina, o papel visível e as mensagens. No Windows/Linux, as áreas transparentes ficam fora da região nativa da janela e permitem clicar nos aplicativos atrás. No macOS, há um tratamento específico de passagem do mouse, ainda não validado em um desktop macOS. Execute npm run test:regions para validar as regiões enviadas ao Electron e o comportamento dos popups.
+
+Para selecionar um arquivo Markdown existente, use o primeiro + ou Ctrl+O (Command+O no macOS). O segundo + cola texto. Um plano selecionado diretamente na pasta de registros é retomado com seu sidecar, sem duplicação; arquivos externos são copiados. Execute npm run test:open-file para validar seleção, cancelamento e restauração.

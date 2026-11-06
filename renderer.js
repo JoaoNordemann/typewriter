@@ -220,7 +220,9 @@ async function load(source) {
   if (busy) return;
   busy = true;
   try {
-    plan = await source();
+    const loaded = await source();
+    if (!loaded) return;
+    plan = loaded;
     generation++;
     celebrated = plan.tasks.every((t) => t.done);
     list = false;
@@ -350,7 +352,7 @@ $("#sound").onclick = async () => {
     error(e);
   }
 };
-$("#add").onclick = async () => {
+$("#paste").onclick = async () => {
   if (plan) {
     error(Error("Conclua ou interrompa o plano atual primeiro"));
     return;
@@ -362,6 +364,24 @@ $("#add").onclick = async () => {
     error(e);
   }
 };
+$("#add").onclick = () => {
+  if (plan) {
+    error(Error("Conclua ou interrompa o plano atual primeiro"));
+    return;
+  }
+  load(() => api.openFile());
+};
+document.addEventListener("keydown", (event) => {
+  if (
+    (event.ctrlKey || event.metaKey) &&
+    event.key.toLowerCase() === "o" &&
+    !event.target.matches("input,textarea") &&
+    $("#overlay").hidden
+  ) {
+    event.preventDefault();
+    $("#add").click();
+  }
+});
 document.addEventListener("paste", (e) => {
   if (e.target.matches("textarea,input")) return;
   e.preventDefault();

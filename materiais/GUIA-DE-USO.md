@@ -16,11 +16,13 @@ A interface está ampliada para 125% do tamanho original. A janela tem 525 px de
 1. Faça uma cópia de `template-plano.md` e renomeie-a, por exemplo, `estudo-de-hoje.md`.
 2. Abra a cópia em um editor de texto ou no Obsidian.
 3. Edite o título, as seções e as tarefas, mantendo a sintaxe do modelo.
-4. Salve e arraste o arquivo `.md` para a máquina. Também é possível copiar o texto e colar com Ctrl+V ou clicar no primeiro `+`.
+4. Salve e clique no primeiro `+` para selecionar o arquivo `.md` no computador, ou use Ctrl+O. Você também pode arrastá-lo para a máquina. Para colar texto, use Ctrl+V ou o segundo `+`.
 
 É obrigatório ter um título `# Meu plano` e pelo menos uma tarefa `- [ ] Minha tarefa`. Seções `## Minha seção` são opcionais. Tarefas já concluídas podem usar `- [x]` ou `- [X]`. Outros textos Markdown são preservados no arquivo, mas não aparecem na máquina.
 
-O aplicativo cria uma cópia na pasta de registros. O arquivo que você arrastou permanece intacto. Importar novamente um nome já existente cria outra cópia com um sufixo; não substitui o plano anterior. Conclua ou interrompa o plano atual antes de carregar outro.
+Ao selecionar pelo primeiro `+` um plano que já está diretamente na pasta de registros, o aplicativo reabre esse mesmo plano e restaura seu progresso, sem duplicá-lo. Arquivos selecionados em outras pastas são importados como cópias.
+
+Ao arrastar um arquivo ou colar texto, o aplicativo cria uma cópia na pasta de registros. O arquivo que você arrastou permanece intacto. Importar novamente um nome já existente cria outra cópia com um sufixo; não substitui o plano anterior. Conclua ou interrompa o plano atual antes de carregar outro.
 
 ## Acompanhar o progresso
 

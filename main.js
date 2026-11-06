@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const { app, BrowserWindow, ipcMain, screen, dialog } = require("electron");
 const path = require("node:path");
 const fs = require("node:fs/promises");
 const { Records, atomic } = require("./records");
@@ -140,7 +140,7 @@ app.whenReady().then(async () => {
     }
     return { plan, muted: !!config.muted, error, directory: records.directory };
   });
-  handle("import", async (input) => {
+  async function importPlan(input) {
     if (!input || typeof input !== "object") throw Error("Importação inválida");
     let text = input.text,
       name;
@@ -155,6 +155,27 @@ app.whenReady().then(async () => {
     if (records.active)
       throw Error("Conclua ou interrompa o plano atual primeiro");
     const plan = await records.import(text, name);
+    config.activePlan = plan.path;
+    await save();
+    return plan;
+  }
+  handle("import", importPlan);
+  handle("open-file", async () => {
+    if (records.active)
+      throw Error("Conclua ou interrompa o plano atual primeiro");
+    const selection = await dialog.showOpenDialog(win, {
+      title: "Abrir plano em Markdown",
+      buttonLabel: "Abrir plano",
+      defaultPath: records.directory,
+      filters: [{ name: "Planos Markdown", extensions: ["md"] }],
+      properties: ["openFile"],
+    });
+    if (selection.canceled || !selection.filePaths.length) return null;
+    const file = selection.filePaths[0];
+    if (path.extname(file).toLowerCase() !== ".md")
+      throw Error("Escolha um arquivo .md");
+    if (!records.safe(file)) return importPlan({ path: file });
+    const plan = await records.open(file);
     config.activePlan = plan.path;
     await save();
     return plan;

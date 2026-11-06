@@ -23,15 +23,25 @@
         </div>
         <div class="body">
           <nav aria-label="Controles do Typewriter">
-            <button id="add" title="Colar um plano (Ctrl+V / ⌘V)">+</button
+            <button
+              id="add"
+              title="Abrir arquivo .md (Ctrl+O / ⌘O)"
+              aria-label="Abrir arquivo Markdown"
+            >
+              +</button
             ><span id="progress">0/0 concluídas</span
-            ><span class="ornament">+</span
+            ><button
+              id="paste"
+              title="Colar um plano (Ctrl+V / ⌘V)"
+              aria-label="Colar plano"
+            >
+              +</button
             ><button id="mode" title="Mostrar lista completa">≡</button
             ><button id="sound" title="Silenciar som">♪</button>
           </nav>
           <div id="idle">
             <p>digite seu plano...<span class="cursor">|</span></p>
-            <small>arraste um arquivo .md ou cole (Ctrl+V / ⌘V)</small>
+            <small>abra no +, arraste .md ou cole (Ctrl+V / ⌘V)</small>
           </div>
           <div id="keyboard" aria-hidden="true"></div>
           <div class="spacebar"></div>
