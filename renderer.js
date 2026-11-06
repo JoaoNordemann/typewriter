@@ -435,3 +435,75 @@ api
     if (state.error) error(Error(state.error));
   })
   .catch(error);
+// Keep the native input region aligned with printing, resizing and dialog changes.
+let regionFrame = null;
+let previousRegions = "";
+function updateInputRegions() {
+  regionFrame = null;
+  const overlay = document.querySelector("#overlay");
+  const rectangles = [];
+  function add(element, clip) {
+    if (!element || getComputedStyle(element).visibility === "hidden") return;
+    const bounds = element.getBoundingClientRect();
+    const x = Math.max(0, bounds.left, clip?.left ?? 0);
+    const y = Math.max(0, bounds.top, clip?.top ?? 0);
+    const right = Math.min(innerWidth, bounds.right, clip?.right ?? innerWidth);
+    const bottom = Math.min(
+      innerHeight,
+      bounds.bottom,
+      clip?.bottom ?? innerHeight,
+    );
+    if (right > x && bottom > y)
+      rectangles.push({ x, y, width: right - x, height: bottom - y });
+  }
+  if (!overlay.hidden) add(overlay);
+  else {
+    add(document.querySelector("#machine"));
+    add(
+      document.querySelector("#paper"),
+      document.querySelector("#paper-track").getBoundingClientRect(),
+    );
+    const error = document.querySelector("#error");
+    if (error.textContent) add(error);
+    document.querySelectorAll(".confetti").forEach((piece) => add(piece));
+  }
+  const serialized = JSON.stringify(rectangles);
+  if (serialized !== previousRegions) {
+    previousRegions = serialized;
+    api.updateInputRegions(rectangles);
+  }
+  if (
+    document.getAnimations().some((animation) => {
+      const target = animation.effect?.target;
+      return (
+        animation.playState === "running" &&
+        target?.matches("#paper,#machine,#app,.confetti")
+      );
+    })
+  )
+    scheduleInputRegions();
+}
+function scheduleInputRegions() {
+  if (regionFrame === null)
+    regionFrame = requestAnimationFrame(updateInputRegions);
+}
+new MutationObserver(scheduleInputRegions).observe(document.body, {
+  subtree: true,
+  childList: true,
+  attributes: true,
+  characterData: true,
+});
+const regionResize = new ResizeObserver(scheduleInputRegions);
+for (const selector of ["#machine", "#paper", "#paper-track", "#error"])
+  regionResize.observe(document.querySelector(selector));
+for (const event of [
+  "resize",
+  "animationstart",
+  "animationend",
+  "animationcancel",
+  "transitionrun",
+  "transitionend",
+])
+  window.addEventListener(event, scheduleInputRegions);
+document.fonts.ready.then(scheduleInputRegions);
+scheduleInputRegions();

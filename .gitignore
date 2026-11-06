@@ -5,3 +5,4 @@ dist/
 test/.portable-runtime/
 test/.scale-runtime/
 test/*.png
+test/.regions-*/

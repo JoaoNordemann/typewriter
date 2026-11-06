@@ -71,6 +71,58 @@ app.whenReady().then(async () => {
       zoomFactor: UI_SCALE,
     },
   });
+  // The OS hit region follows only the visible artwork, not the transparent canvas.
+  let inputRegions = [];
+  ipcMain.on("input-regions", (event, regions) => {
+    if (
+      event.sender !== win.webContents ||
+      !Array.isArray(regions) ||
+      regions.length > 64
+    )
+      return;
+    const [width, height] = win.getContentSize();
+    inputRegions = regions
+      .filter((r) => r && [r.x, r.y, r.width, r.height].every(Number.isFinite))
+      .map((r) => {
+        const x = Math.max(0, Math.floor(r.x * UI_SCALE));
+        const y = Math.max(0, Math.floor(r.y * UI_SCALE));
+        return {
+          x,
+          y,
+          width: Math.max(
+            0,
+            Math.min(width, Math.ceil((r.x + r.width) * UI_SCALE)) - x,
+          ),
+          height: Math.max(
+            0,
+            Math.min(height, Math.ceil((r.y + r.height) * UI_SCALE)) - y,
+          ),
+        };
+      })
+      .filter((r) => r.width > 0 && r.height > 0);
+    if (process.platform !== "darwin" && inputRegions.length)
+      win.setShape(inputRegions);
+  });
+  // macOS has no setShape; leave the transparent area click-through instead.
+  let pointerTimer;
+  if (process.platform === "darwin") {
+    let ignored = false;
+    pointerTimer = setInterval(() => {
+      if (win.isDestroyed() || !inputRegions.length) return;
+      const cursor = screen.getCursorScreenPoint(),
+        bounds = win.getBounds();
+      const x = cursor.x - bounds.x,
+        y = cursor.y - bounds.y;
+      const outside = !inputRegions.some(
+        (r) => x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height,
+      );
+      if (outside !== ignored) {
+        ignored = outside;
+        win.setIgnoreMouseEvents(outside, { forward: true });
+      }
+    }, 16);
+  }
+  win.on("closed", () => clearInterval(pointerTimer));
   win.setMenu(null);
   win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   win.webContents.on("will-navigate", (event) => event.preventDefault());

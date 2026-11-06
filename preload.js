@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer, webUtils } = require("electron");
 contextBridge.exposeInMainWorld("typewriter", {
+  updateInputRegions: (regions) => ipcRenderer.send("input-regions", regions),
   initial: () => ipcRenderer.invoke("initial"),
   importText: (text) => ipcRenderer.invoke("import", { text }),
   importFile: (file) =>
